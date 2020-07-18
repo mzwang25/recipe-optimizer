@@ -22,3 +22,28 @@ class dbop:
             })
 
         return(dicts)
+
+    # adds a recipe. If formatted correctly will return id. Returns -1 otherwise
+    def add_recipe(self, name, ingredients, notes):
+        name = name.upper()
+        ingredients = ingredients.upper().split(',')
+
+        for i in ingredients:
+            if(' ' in i):
+                return -1
+
+        ingredients = str(ingredients)[1:-1].replace(' ', '').replace("'", '')
+
+        query = "INSERT INTO recipes(name, ingredients, notes) VALUES('{}','{}','{}')"
+
+        print(query.format(name, ingredients, notes))
+        self.cursor.execute(query.format(name, ingredients, notes))
+        self.conn.commit()
+        return(self.cursor.lastrowid)
+
+    #deletes recipe by id
+    def delete_recipe(self, id):
+        query = "DELETE FROM recipes where id = {}"
+        self.cursor.execute(query.format(id))
+        self.conn.commit()
+
