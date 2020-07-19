@@ -1,10 +1,21 @@
 from flask import Flask
 from flask import request
+from flask_mail import Mail, Message
 from db.dbop import dbop
 import json
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
+
+application.config.update(
+    MAIL_SERVER = "smtp.gmail.com",
+    MAIL_PORT = 465,
+    MAIL_USE_SSL = True,
+    MAIL_USERNAME = "recipeoptimizer@gmail.com",
+    MAIL_PASSWORD = 'a3b2c1a3b2c1' #just temp password
+)
+
+mail = Mail(application)
 
 @application.route('/', methods=['GET'])
 def home():
@@ -94,7 +105,7 @@ def recipeSchedule(jsonObj = True):
         return return_obj
 
 @application.route('/ingredients-needed', methods=['GET'])
-def ingredientsNeeded():
+def ingredientsNeeded(jsonObj = True):
     schedule = recipeSchedule(jsonObj = False)
     allIngredients = []
     for s in schedule:
@@ -108,7 +119,25 @@ def ingredientsNeeded():
             "name" : s
         })
 
-    return(json.dumps(return_obj))
+    if(jsonObj):
+        return(json.dumps(return_obj))
+    else:
+        return(return_obj)
+
+@application.route('/send-needed-ingredients/')
+def sendNeededIngredients():
+
+    neededIngredients = ingredientsNeeded(jsonObj = False)
+
+    msg = Message("Ingredients Needed",
+        sender="recipeoptimizer@gmail.com",
+        recipients=["mzwang25@gmail.com"])
+
+    msg.body = "Hi! You need these ingredients to make it work:\n"
+    for i in neededIngredients:
+        msg.body = msg.body + "- " + i.get("name") + "\n"
+    mail.send(msg)
+    return 'Mail sent!'
 
 # run the app.
 if __name__ == "__main__":
