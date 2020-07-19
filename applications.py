@@ -41,8 +41,6 @@ def deleteRecipe():
     db = dbop()
     return(json.dumps(db.get_all_recipes()))
 
-
-
 @application.route('/get-schedule', methods=['GET'])
 def getSchedule():
     db = dbop()
@@ -72,7 +70,7 @@ def deleteSchedule():
         return "<div> check your parameters! </div>"
 
     db = dbop()
-    return(db.delete_schedule(id)
+    return(db.delete_schedule(id))
 
 
 # run the app.
