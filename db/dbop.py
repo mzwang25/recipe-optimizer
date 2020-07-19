@@ -64,9 +64,6 @@ class dbop:
     # adds a schedule. If formatted correctly will return id. Returns -1 otherwise
     def add_schedule(self, recipe_id, notes):
 
-        if(recipe_id.is_integer()):
-            return -1
-
         query = "INSERT INTO schedules(recipe_id, notes) VALUES('{}','{}')"
 
         self.cursor.execute(query.format(recipe_id, notes))
