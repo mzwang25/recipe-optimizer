@@ -72,6 +72,43 @@ def deleteSchedule():
     db = dbop()
     return(db.delete_schedule(id))
 
+@application.route('/recipe-schedule', methods=['GET'])
+def recipeSchedule(jsonObj = True):
+    db = dbop()
+    schedule = db.get_all_schedule()
+
+    return_obj = []
+    for s in schedule:
+        recipe = db.recipe_by_id(s.get('recipe_id'))
+        return_obj.append({
+            "schedule_id" : s.get('id'),
+            "recipe_id" : s.get('recipe_id'),
+            "notes" : s.get('notes'),
+            "recipe_name" : recipe.get('name'),
+            "ingredients" : recipe.get('ingredients')
+        })
+            
+    if(jsonObj):
+        return(json.dumps(return_obj))
+    else:
+        return return_obj
+
+@application.route('/ingredients-needed', methods=['GET'])
+def ingredientsNeeded():
+    schedule = recipeSchedule(jsonObj = False)
+    allIngredients = []
+    for s in schedule:
+        allIngredients.extend(s.get('ingredients').split(','))
+
+    allIngredients = set(allIngredients)
+
+    return_obj = []
+    for s in allIngredients:
+        return_obj.append({
+            "name" : s
+        })
+
+    return(json.dumps(return_obj))
 
 # run the app.
 if __name__ == "__main__":

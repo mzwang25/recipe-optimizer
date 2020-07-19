@@ -8,6 +8,21 @@ class dbop:
     def __del__(self):
         self.conn.close()
 
+    def recipe_by_id(self, id):
+        self.cursor.execute("SELECT * from recipes WHERE id = {}".format(id))
+        rows = self.cursor.fetchall()
+        dicts = []
+        for r in rows:
+            dicts.append({
+                "id" : r[0],
+                "name" : r[1],
+                "ingredients" : r[2],
+                "notes" : r[3]
+            })
+        # Since we're searching by id, there should only be one result
+        return(dicts[0])
+
+
     # Gets all the recipes in the db with an array of dictionaries
     def get_all_recipes(self):
         self.cursor.execute("SELECT * from recipes")
