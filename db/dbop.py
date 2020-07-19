@@ -2,7 +2,7 @@ import sqlite3
 
 class dbop:
     def __init__(self):
-        self.conn = sqlite3.connect('storage.db')
+        self.conn = sqlite3.connect('db/storage.db')
         self.cursor = self.conn.cursor()
 
     def __del__(self):
@@ -47,3 +47,35 @@ class dbop:
         self.cursor.execute(query.format(id))
         self.conn.commit()
 
+    # Gets all the schedule in the db with an array of dictionaries
+    def get_all_schedule(self):
+        self.cursor.execute("SELECT * from schedules")
+        rows = self.cursor.fetchall()
+        dicts = []
+        for r in rows:
+            dicts.append({
+                "id" : r[0],
+                "recipe_id" : r[1],
+                "notes" : r[2]
+            })
+
+        return(dicts)
+
+    # adds a schedule. If formatted correctly will return id. Returns -1 otherwise
+    def add_schedule(self, recipe_id, notes):
+
+        if(recipe_id.is_integer()):
+            return -1
+
+        query = "INSERT INTO schedules(recipe_id, notes) VALUES('{}','{}')"
+
+        self.cursor.execute(query.format(recipe_id, notes))
+        self.conn.commit()
+
+        return(self.cursor.lastrowid)
+
+    #deletes schedule by id
+    def delete_schedule(self, id):
+        query = "DELETE FROM schedules where id = {}"
+        self.cursor.execute(query.format(id))
+        self.conn.commit()
