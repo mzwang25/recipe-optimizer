@@ -2,11 +2,22 @@ from flask import Flask
 from flask import request
 from flask_mail import Mail, Message
 from flask_cors import CORS
+from flaskext.mysql import MySQL
 from db.dbop import dbop
 import json
 
 # EB looks for an 'app' callable by default.
 app = Flask(__name__)
+
+mysql = MySQL()
+
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'mypass'
+app.config['MYSQL_DATABASE_DB'] = 'recipe_optimizer' 
+app.config['MYSQL_DATABASE_HOST'] = '34.94.57.213'
+mysql.init_app(app)
+
+conn = mysql.connect()
 
 app.config.update(
     MAIL_SERVER = "smtp.gmail.com",
@@ -26,7 +37,7 @@ def home():
 
 @app.route('/get-recipes', methods=['GET'])
 def getRecipes():
-    db = dbop()
+    db = dbop(conn)
     return(json.dumps(db.get_all_recipes()))
 
 @app.route('/add-recipe', methods=['GET'])
@@ -38,7 +49,7 @@ def addRecipe():
     if(name == None or ingredients == None or notes == None):
         return "<div> check your parameters! </div>"
 
-    db = dbop()
+    db = dbop(conn)
     rc = db.add_recipe(name, ingredients, notes)
 
     if(rc < 0):
@@ -52,13 +63,13 @@ def deleteRecipe():
 
     if(id == None):
         return "<div> check your parameters! </div>"
-    db = dbop()
+    db = dbop(conn)
     ((db.delete_recipe(id)))
     return "<div> done! </div>"
 
 @app.route('/get-schedule', methods=['GET'])
 def getSchedule():
-    db = dbop()
+    db = dbop(conn)
     return(json.dumps(db.get_all_schedule()))
 
 @app.route('/add-schedule', methods=['GET'])
@@ -69,7 +80,7 @@ def addSchedule():
     if(recipe_id == None or notes == None):
         return "<div> check your parameters! </div>"
 
-    db = dbop()
+    db = dbop(conn)
     rc = db.add_schedule(recipe_id, notes)
 
     if(rc < 0):
@@ -84,13 +95,13 @@ def deleteSchedule():
     if(id == None):
         return "<div> check your parameters! </div>"
 
-    db = dbop()
+    db = dbop(conn)
     (db.delete_schedule(id))
     return "<div> Done! </div>"
 
 @app.route('/recipe-schedule', methods=['GET'])
 def recipeSchedule(jsonObj = True):
-    db = dbop()
+    db = dbop(conn)
     schedule = db.get_all_schedule()
 
     return_obj = []
@@ -147,3 +158,4 @@ def sendNeededIngredients():
 # run the app.
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8080, debug=True)
+    #app.run(host="localhost", port=5000, debug=True)

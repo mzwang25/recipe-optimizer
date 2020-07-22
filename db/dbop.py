@@ -1,12 +1,13 @@
 import sqlite3
 
 class dbop:
-    def __init__(self):
-        self.conn = sqlite3.connect('db/storage.db')
+    def __init__(self, conn):
+        self.conn = conn
         self.cursor = self.conn.cursor()
 
     def __del__(self):
-        self.conn.close()
+        pass
+        #self.conn.close()
 
     def recipe_by_id(self, id):
         self.cursor.execute("SELECT * from recipes WHERE id = {}".format(id))
@@ -28,6 +29,7 @@ class dbop:
         self.cursor.execute("SELECT * from recipes")
         rows = self.cursor.fetchall()
         dicts = []
+
         for r in rows:
             dicts.append({
                 "id" : r[0],
