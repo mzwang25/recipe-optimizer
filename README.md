@@ -1,6 +1,8 @@
 # recipe-optimizer
 
-http://flask-env.eba-xaseukz9.us-east-2.elasticbeanstalk.com/send-needed-ingredients
+Deployed on google cloud <br/>
+
+https://recipe-optimizer.wl.r.appspot.com/
 
 <ul>
     <li> /get-recipes</li>

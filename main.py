@@ -1,13 +1,14 @@
 from flask import Flask
 from flask import request
 from flask_mail import Mail, Message
+from flask_cors import CORS
 from db.dbop import dbop
 import json
 
-# EB looks for an 'application' callable by default.
-application = Flask(__name__)
+# EB looks for an 'app' callable by default.
+app = Flask(__name__)
 
-application.config.update(
+app.config.update(
     MAIL_SERVER = "smtp.gmail.com",
     MAIL_PORT = 465,
     MAIL_USE_SSL = True,
@@ -15,18 +16,20 @@ application.config.update(
     MAIL_PASSWORD = 'a3b2c1a3b2c1' #just temp password
 )
 
-mail = Mail(application)
+CORS(app)
 
-@application.route('/', methods=['GET'])
+mail = Mail(app)
+
+@app.route('/', methods=['GET'])
 def home():
     return "<h1> This is Recipe-Optimizer! </h1>"
 
-@application.route('/get-recipes', methods=['GET'])
+@app.route('/get-recipes', methods=['GET'])
 def getRecipes():
     db = dbop()
     return(json.dumps(db.get_all_recipes()))
 
-@application.route('/add-recipe', methods=['GET'])
+@app.route('/add-recipe', methods=['GET'])
 def addRecipe():
     name = request.args.get('name')
     ingredients = request.args.get('ingredients')
@@ -43,21 +46,22 @@ def addRecipe():
 
     return(str(rc))
 
-@application.route('/delete-recipe', methods=['GET'])
+@app.route('/delete-recipe', methods=['GET'])
 def deleteRecipe():
     id = int(request.args.get('id'))
 
     if(id == None):
         return "<div> check your parameters! </div>"
     db = dbop()
-    return(json.dumps(db.get_all_recipes()))
+    ((db.delete_recipe(id)))
+    return "<div> done! </div>"
 
-@application.route('/get-schedule', methods=['GET'])
+@app.route('/get-schedule', methods=['GET'])
 def getSchedule():
     db = dbop()
     return(json.dumps(db.get_all_schedule()))
 
-@application.route('/add-schedule', methods=['GET'])
+@app.route('/add-schedule', methods=['GET'])
 def addSchedule():
     recipe_id = int(request.args.get('recipe_id'))
     notes = request.args.get('notes')
@@ -73,7 +77,7 @@ def addSchedule():
 
     return(str(rc))
 
-@application.route('/delete-schedule', methods=['GET'])
+@app.route('/delete-schedule', methods=['GET'])
 def deleteSchedule():
     id = int(request.args.get('id'))
 
@@ -81,9 +85,10 @@ def deleteSchedule():
         return "<div> check your parameters! </div>"
 
     db = dbop()
-    return(db.delete_schedule(id))
+    (db.delete_schedule(id))
+    return "<div> Done! </div>"
 
-@application.route('/recipe-schedule', methods=['GET'])
+@app.route('/recipe-schedule', methods=['GET'])
 def recipeSchedule(jsonObj = True):
     db = dbop()
     schedule = db.get_all_schedule()
@@ -104,7 +109,7 @@ def recipeSchedule(jsonObj = True):
     else:
         return return_obj
 
-@application.route('/ingredients-needed', methods=['GET'])
+@app.route('/ingredients-needed', methods=['GET'])
 def ingredientsNeeded(jsonObj = True):
     schedule = recipeSchedule(jsonObj = False)
     allIngredients = []
@@ -124,7 +129,7 @@ def ingredientsNeeded(jsonObj = True):
     else:
         return(return_obj)
 
-@application.route('/send-needed-ingredients/')
+@app.route('/send-needed-ingredients/')
 def sendNeededIngredients():
 
     neededIngredients = ingredientsNeeded(jsonObj = False)
@@ -141,7 +146,4 @@ def sendNeededIngredients():
 
 # run the app.
 if __name__ == "__main__":
-    # Setting debug to True enables debug output. This line should be
-    # removed before deploying a production app.
-    application.debug = True
-    application.run(host='0.0.0.0')
+    app.run(host="127.0.0.1", port=8080, debug=True)
