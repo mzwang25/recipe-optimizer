@@ -4,32 +4,36 @@ from flask_mail import Mail, Message
 from flask_cors import CORS
 from flaskext.mysql import MySQL
 from db.dbop import dbop
+from sensitive import pwds
 import json
 
 # EB looks for an 'app' callable by default.
 app = Flask(__name__)
 
+
+app.config['MYSQL_DATABASE_USER'] = pwds.MYSQL_DATABASE_USER
+app.config['MYSQL_DATABASE_PASSWORD'] = pwds.MYSQL_DATABASE_PASSWORD
+app.config['MYSQL_DATABASE_DB'] = pwds.MYSQL_DATABASE_DB
+app.config['MYSQL_DATABASE_HOST'] = pwds.MYSQL_DATABASE_HOST
+
 mysql = MySQL()
 
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'mypass'
-app.config['MYSQL_DATABASE_DB'] = 'recipe_optimizer' 
-app.config['MYSQL_DATABASE_HOST'] = '34.94.57.213'
-mysql.init_app(app)
-
-conn = mysql.connect()
 
 app.config.update(
     MAIL_SERVER = "smtp.gmail.com",
     MAIL_PORT = 465,
     MAIL_USE_SSL = True,
-    MAIL_USERNAME = "recipeoptimizer@gmail.com",
-    MAIL_PASSWORD = 'a3b2c1a3b2c1' #just temp password
+    MAIL_USERNAME = pwds.MAIL_USERNAME,
+    MAIL_PASSWORD = pwds.MAIL_PASSWORD #just temp password
 )
 
 CORS(app)
 
 mail = Mail(app)
+
+mysql.init_app(app)
+
+conn = mysql
 
 @app.route('/', methods=['GET'])
 def home():
@@ -154,8 +158,7 @@ def sendNeededIngredients():
         msg.body = msg.body + "- " + i.get("name") + "\n"
     mail.send(msg)
     return 'Mail sent!'
-
 # run the app.
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8080, debug=True)
-    #app.run(host="localhost", port=5000, debug=True)
+    #app.run(host="127.0.0.1", port=8080, debug=True)
+    app.run(host="localhost", port=5000, debug=True)

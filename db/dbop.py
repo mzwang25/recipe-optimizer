@@ -2,12 +2,12 @@ import sqlite3
 
 class dbop:
     def __init__(self, conn):
-        self.conn = conn
+        self.conn = conn.connect()
         self.cursor = self.conn.cursor()
 
     def __del__(self):
         pass
-        #self.conn.close()
+        self.conn.close()
 
     def recipe_by_id(self, id):
         self.cursor.execute("SELECT * from recipes WHERE id = {}".format(id))
