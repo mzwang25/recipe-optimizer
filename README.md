@@ -25,7 +25,7 @@ and here are the following conversions
     <li> tbsp = 14.7868 cm^3 </li>
     <li> tsp  = 4.92892 cm^3</li>
     <li> cups = 236.588 cm^3 </li>
-    <li> l = 1000 cm^3</li>
+    <li> li = 1000 cm^3</li>
     <li> ml = 1 cm^3 </li>
     <li> gal = 3785.41 cm^3 </li>
     <li> g = 1g </li>
