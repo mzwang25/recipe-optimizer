@@ -158,6 +158,20 @@ def sendNeededIngredients():
         msg.body = msg.body + "- " + i.get("name") + "\n"
     mail.send(msg)
     return 'Mail sent!'
+    
+@app.route('/prank')
+def prank():
+    for i in range (0,100):
+        print(i)
+        msg = Message("Ingredients Needed {}".format(i),
+            sender="recipeoptimizer@gmail.com",
+            recipients=["meganwang8392@gmail.com"])
+
+        msg.body = "Try out https://front-recipe-optimizer-git-master.mzwang25.vercel.app/ #{}".format(i)
+        mail.send(msg)
+
+    return 'done!'
+
 # run the app.
 if __name__ == "__main__":
     #app.run(host="127.0.0.1", port=8080, debug=True)
