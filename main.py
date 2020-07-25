@@ -192,9 +192,11 @@ def ingredientsNeeded(jsonObj = True):
                 "ml" : num / ip.conversionFactor['ml'][0],
                 "gal" : num / ip.conversionFactor['gal'][0],
                 "g" : 0,
-                "oz" : 0
+                "oz" : 0,
+                "p" : 0
+
             })
-        else:
+        elif (unit == "G"):
             return_obj.append({
                 "name" : ingredientNames[i],
                 "tbsp" : 0,
@@ -204,7 +206,22 @@ def ingredientsNeeded(jsonObj = True):
                 "ml" : 0,
                 "gal" : 0,
                 "g" : num / ip.conversionFactor['g'][0],
-                "oz" : num / ip.conversionFactor['oz'][0]
+                "oz" : num / ip.conversionFactor['oz'][0],
+                "p" : 0
+            })
+
+        else:
+            return_obj.append({
+                "name" : ingredientNames[i],
+                "tbsp" : 0,
+                "tsp" : 0,
+                "cups" : 0,
+                "li" : 0,
+                "ml" : 0,
+                "gal" : 0,
+                "g" : 0,
+                "oz" : 0,
+                "p" : num
             })
 
 
@@ -242,5 +259,5 @@ def prank():
 
 # run the app.
 if __name__ == "__main__":
-    #app.run(host="127.0.0.1", port=8080, debug=True)
-    app.run(host="localhost", port=5000, debug=True)
+    app.run(host="127.0.0.1", port=8080, debug=True)
+    #app.run(host="localhost", port=5000, debug=True)

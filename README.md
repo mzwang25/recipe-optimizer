@@ -47,7 +47,7 @@ and here are the following conversions
     <li> /send-needed-ingredients</li>
 </ul>
 
-## /send-needed-ingredients
+## /ingredients-needed
 This sends back units. Only weight/volume is used. If the original 
 user input was in weight, all volume units are 0. Same other way.
 ```json

@@ -11,7 +11,8 @@ class Ingredients_Parser:
         "ml" : (1, "cm3"),
         "gal" : (3785.41, "cm3"),
         "g" : (1, "g"),
-        "oz" : (28.3495, "g")
+        "oz" : (28.3495, "g"),
+        "p" : (1, "p")
     }
 
     def __init__(self, raw_ingredients):
