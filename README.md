@@ -46,3 +46,31 @@ and here are the following conversions
     <li> /ingredients-needed</li>
     <li> /send-needed-ingredients</li>
 </ul>
+
+## /send-needed-ingredients
+This sends back units. Only weight/volume is used. If the original 
+user input was in weight, all volume units are 0. Same other way.
+```json
+    {
+        "name": "WATER",
+        "tbsp": 1.3333297265128357,
+        "tsp": 4.0,
+        "cups": 0.08333338969009417,
+        "li": 0.01971568,
+        "ml": 19.71568,
+        "gal": 0.005208334103835516,
+        "g": 0,
+        "oz": 0
+    },
+    {
+        "name": "HELLO",
+        "tbsp": 0,
+        "tsp": 0,
+        "cups": 0,
+        "li": 0,
+        "ml": 0,
+        "gal": 0,
+        "g": 21.0,
+        "oz": 0.7407538051817493
+    },
+```

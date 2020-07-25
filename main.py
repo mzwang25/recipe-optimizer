@@ -4,7 +4,9 @@ from flask_mail import Mail, Message
 from flask_cors import CORS
 from flaskext.mysql import MySQL
 from db.dbop import dbop
+from ingredient_parser import Ingredients_Parser
 from sensitive import pwds
+import re
 import json
 
 # EB looks for an 'app' callable by default.
@@ -53,11 +55,17 @@ def addRecipe():
     if(name == None or ingredients == None or notes == None):
         return "<div> check your parameters! </div>"
 
+    ip = Ingredients_Parser(ingredients)
+
+    if(not ip.isValid):
+        return "<div> something bad happened. might be with ingredient's formatting </div>"
+
     db = dbop(conn)
-    rc = db.add_recipe(name, ingredients, notes)
+    rc = db.add_recipe(name, ip.clean_ingredients, notes)
 
     if(rc < 0):
         return "<div> something bad happened. might be with ingredient's formatting </div>"
+
 
     return(str(rc))
 
@@ -131,13 +139,74 @@ def ingredientsNeeded(jsonObj = True):
     for s in schedule:
         allIngredients.extend(s.get('ingredients').split(','))
 
-    allIngredients = set(allIngredients)
+    # We now every ingredient the user inputted
+    # Now combine and add like measurements
+    # This is a pretty bad algo I think but it works
+
+    # coalesce like units into ingredientNames and ingredientAmounts
+    ingredientNames = []
+    ingredientAmounts = []
+    for i in allIngredients:
+        name = i.split('(')[0]
+        val = i.split('(')[1][:-1]
+
+        if(not i.split('(')[0] in ingredientNames):
+            ingredientNames.append(name)
+            insert = val.split(':')
+            insert[0] = float(insert[0])
+            ingredientAmounts.append(insert)
+        else: #Another of the same name already found
+            number = float(val.split(':')[0])
+            unit = val.split(':')[1]
+
+            foundOne = False
+            for j in range(len(ingredientNames)):
+                if(ingredientNames[j] == name and ingredientAmounts[j][1] == unit):
+                    ingredientAmounts[j][0] += number
+                    foundOne = True
+                    break
+
+            if(not foundOne):
+                ingredientNames.append(name)
+                insert = val.split(':')
+                insert[0] = float(insert[0])
+                ingredientAmounts.append(insert)
+
+    #at this point: ingredientNames is list of names to be printed and amounts are coalesced units
+    #like units have been grouped together
 
     return_obj = []
-    for s in allIngredients:
-        return_obj.append({
-            "name" : s
-        })
+    ip = Ingredients_Parser("")
+    for i in range(len(ingredientNames)):
+        name = ingredientNames[i]
+        num = float(ingredientAmounts[i][0])
+        unit = ingredientAmounts[i][1]
+        
+        if(unit == "CM3"):
+            return_obj.append({
+                "name" : ingredientNames[i],
+                "tbsp" : num / ip.conversionFactor['tbsp'][0],
+                "tsp" : num / ip.conversionFactor['tsp'][0],
+                "cups" : num / ip.conversionFactor['cups'][0],
+                "li" : num / ip.conversionFactor['li'][0],
+                "ml" : num / ip.conversionFactor['ml'][0],
+                "gal" : num / ip.conversionFactor['gal'][0],
+                "g" : 0,
+                "oz" : 0
+            })
+        else:
+            return_obj.append({
+                "name" : ingredientNames[i],
+                "tbsp" : 0,
+                "tsp" : 0,
+                "cups" : 0,
+                "li" : 0,
+                "ml" : 0,
+                "gal" : 0,
+                "g" : num / ip.conversionFactor['g'][0],
+                "oz" : num / ip.conversionFactor['oz'][0]
+            })
+
 
     if(jsonObj):
         return(json.dumps(return_obj))
@@ -162,7 +231,6 @@ def sendNeededIngredients():
 @app.route('/prank')
 def prank():
     for i in range (0,100):
-        print(i)
         msg = Message("Ingredients Needed {}".format(i),
             sender="recipeoptimizer@gmail.com",
             recipients=["meganwang8392@gmail.com"])
