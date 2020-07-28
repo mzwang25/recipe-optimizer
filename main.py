@@ -237,17 +237,36 @@ def sendNeededIngredients():
 
     msg = Message("Ingredients Needed",
         sender="recipeoptimizer@gmail.com",
-        recipients=["mzwang25@gmail.com"])
+        recipients=["mzwang25@gmail.com", "meganwang8392@gmail.com"])
 
     msg.body = "Hi! You need these ingredients to make it work:\n"
+
+
     for i in neededIngredients:
-        msg.body = msg.body + "- " + i.get("name") + "\n"
+        msg.body = msg.body + "====================\n"
+        msg.body = msg.body + "<<" + i.get("name") + ">>" + "\n"
+
+        # if piece unit
+        if(i.get('tbsp') == 0 and i.get('g') == 0):
+            msg.body += "- " + str(i.get('p')) + " p\n"
+        elif(i.get('tbsp') == 0 and i.get('p') == 0): #if weight unit
+            msg.body += "- " + str(i.get('g')) + " g\n"
+            msg.body += "- " + str(i.get('oz')) + " oz\n"
+        else:
+            msg.body += "- " + str(i.get('tbsp')) + " tbsp\n"
+            msg.body += "- " + str(i.get('tsp')) + " tsp\n"
+            msg.body += "- " + str(i.get('cups')) + " cups\n"
+            msg.body += "- " + str(i.get('li')) + " li\n"
+            msg.body += "- " + str(i.get('ml')) + " ml\n"
+            msg.body += "- " + str(i.get('gal')) + " gal\n"
+
     mail.send(msg)
     return 'Mail sent!'
     
 @app.route('/prank')
 def prank():
     for i in range (0,100):
+        print(i)
         msg = Message("Ingredients Needed {}".format(i),
             sender="recipeoptimizer@gmail.com",
             recipients=["meganwang8392@gmail.com"])
@@ -259,5 +278,5 @@ def prank():
 
 # run the app.
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8080, debug=True)
-    #app.run(host="localhost", port=5000, debug=True)
+    #app.run(host="127.0.0.1", port=8080, debug=True)
+    app.run(host="localhost", port=5000, debug=True)
