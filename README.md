@@ -6,12 +6,6 @@ Deployed on google cloud <br/>
 https://recipe-optimizer.wl.r.appspot.com/
 
 ## Units 
-Here are all the units I can think of that are used in cooking <br/>
-<ul>
-    <li> volume </li>
-    <li> weight </li>
-</ul>
-
 To not confuse any units, all units are converted to
 
 <ul>
